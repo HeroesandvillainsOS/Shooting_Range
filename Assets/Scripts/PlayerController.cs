@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    // Test comment
     // Rotation
     private float mouseSensitivity = 100f;
     private float yRotation = 0f; 
