@@ -9,8 +9,8 @@ public class PlayerController : MonoBehaviour
       
     // Movement
     private float speed;
-    private float crouchSpeed = 3f;
-    private float walkSpeed = 5f;
+    private float crouchSpeed = 2f;
+    private float walkSpeed = 4f;
     private float jogSpeed = 8f;
 
     // Bools
