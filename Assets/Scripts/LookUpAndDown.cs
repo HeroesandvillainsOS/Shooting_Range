@@ -1,28 +1,34 @@
+using UnityEngine.InputSystem;
 using UnityEngine;
 
 public class LookUpAndDown : MonoBehaviour
 {
-    private float mouseSensitivity = 50f;
+    // Rotation
+    private float mouseSensitivity = 0.1f;
     private float xRotation = 0f;
     private float maxRotation = 45f;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    // Input System
+    private Vector2 lookDirection;
+    public InputActionReference look;
+
+    private void Update()
     {
-        
+        // Reads the Input System moveDirection Vector 2 value
+        lookDirection = look.action.ReadValue<Vector2>();
     }
 
     // Ensures vertical rotation is calculated after horizontal rotation
     void LateUpdate()
     {
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
+        float mouseY = lookDirection.y * mouseSensitivity;
 
-        // Inverts the horizontal mouse movements
+        // Inverts the vertical mouse movements
         xRotation -= mouseY;
-        // Limits horizontal rotation
+        // Limits vertical rotation
         xRotation = Mathf.Clamp(xRotation, -maxRotation, maxRotation);
-
-
+        // Initiates vertical rotation
         transform.localRotation = Quaternion.Euler(xRotation, 0, 0);
     }
 }
+
