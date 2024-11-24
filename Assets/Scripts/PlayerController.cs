@@ -31,6 +31,9 @@ public class PlayerController : MonoBehaviour
     private Animator animator;
     private float hInput;
     private float vInput;
+    private float crouchLayerWeight = 0f;
+    private float crouchLayerTransitionSpeed = 10f;
+    private int crouchLayerIndex;
 
     private void OnEnable()
     {
@@ -50,8 +53,9 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        // Gets reference to Game Object Components
+        // Gets references to Game Object Components and Animator information
         animator = GetComponentInChildren<Animator>();
+        crouchLayerIndex = animator.GetLayerIndex("Crouch Layer");
     }
 
     private void Update()
@@ -63,13 +67,24 @@ public class PlayerController : MonoBehaviour
         // Handles Animator movement input values
         animator.SetFloat("hInput", hInput);
         animator.SetFloat("vInput", vInput);
-
-        // Handles Animator movement bools
+      
+        // Handles Animator walking logic
         animator.SetBool("isWalking", isWalking);
         if (isCrouching || isJogging)
             isWalking = false;
         else
             isWalking = true;
+
+        // Handles Animator crouching logic
+        if (isCrouching)
+            // Increases layer weight
+            crouchLayerWeight += Time.deltaTime * crouchLayerTransitionSpeed;
+        else
+            crouchLayerWeight -= Time.deltaTime * crouchLayerTransitionSpeed;
+        // Clamps layer weight
+        crouchLayerWeight = Mathf.Clamp01(crouchLayerWeight);
+        // Sets layer weight
+        animator.SetLayerWeight(crouchLayerIndex, crouchLayerWeight);
     }
 
     // Ensures there is no stuttering when colliding with objects
@@ -112,6 +127,5 @@ public class PlayerController : MonoBehaviour
     private void Crouch(InputAction.CallbackContext context)
     {
         isCrouching = !isCrouching;
-        animator.SetBool("isCrouching", isCrouching);
     }
 }
