@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour
     private float jogSpeed = 8f;
 
     // Bools
+    private bool isWalking = true;
     public bool isCrouching = false;
     private bool isJogging = false;
 
@@ -25,6 +26,11 @@ public class PlayerController : MonoBehaviour
     public InputActionReference look;
     public InputActionReference jog;
     public InputActionReference crouch;
+
+    // Animator
+    private Animator animator;
+    private float hInput;
+    private float vInput;
 
     private void OnEnable()
     {
@@ -42,11 +48,28 @@ public class PlayerController : MonoBehaviour
         crouch.action.started -= Crouch;
     }
 
+    private void Start()
+    {
+        // Gets reference to Game Object Components
+        animator = GetComponentInChildren<Animator>();
+    }
+
     private void Update()
     {
         // Reads the Input System moveDirection Vector 2 value
         moveDirection = move.action.ReadValue<Vector2>();
         lookDirection = look.action.ReadValue<Vector2>();
+
+        // Handles Animator movement input values
+        animator.SetFloat("hInput", hInput);
+        animator.SetFloat("vInput", vInput);
+
+        // Handles Animator movement bools
+        animator.SetBool("isWalking", isWalking);
+        if (isCrouching || isJogging)
+            isWalking = false;
+        else
+            isWalking = true;
     }
 
     // Ensures there is no stuttering when colliding with objects
@@ -65,6 +88,10 @@ public class PlayerController : MonoBehaviour
         // Normalizes the movement so moving diagonal isn't faster than non-diagonal movements
         Vector3 movement = new Vector3(moveDirection.x, 0f, moveDirection.y).normalized;
 
+        // Sets Animator movement input values
+        hInput = moveDirection.x;
+        vInput = moveDirection.y;   
+
         // Moves the player
         transform.Translate(speed * Time.deltaTime * movement);
     }
@@ -73,15 +100,18 @@ public class PlayerController : MonoBehaviour
     private void Jog(InputAction.CallbackContext context)
     {
         isJogging = true;
+        animator.SetBool("isJogging", true);
     }
 
     private void StopJog(InputAction.CallbackContext context)
     {
         isJogging = false;
+        animator.SetBool("isJogging", false);
     }
 
     private void Crouch(InputAction.CallbackContext context)
     {
         isCrouching = !isCrouching;
+        animator.SetBool("isCrouching", isCrouching);
     }
 }
